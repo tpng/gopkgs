@@ -30,22 +30,20 @@ import (
 )
 
 func main() {
-	for _, path := range importPaths() {
+	// output GOROOT pkgs
+	for _, path := range importPaths([]string{os.Getenv("GOROOT"), runtime.GOROOT()}) {
+		fmt.Println(path)
+	}
+	fmt.Println("unsafe")
+
+	// output GOPATH pkgs
+	for _, path := range importPaths([]string{os.Getenv("GOPATH")}) {
 		fmt.Println(path)
 	}
 }
 
-func importPaths() []string {
-	imports := []string{
-		"unsafe",
-	}
+func importPaths(env []string) (imports []string) {
 	paths := map[string]bool{}
-
-	env := []string{
-		os.Getenv("GOPATH"),
-		os.Getenv("GOROOT"),
-		runtime.GOROOT(),
-	}
 	for _, ent := range env {
 		for _, path := range filepath.SplitList(ent) {
 			if path != "" {
