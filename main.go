@@ -31,18 +31,18 @@ import (
 
 func main() {
 	// output GOROOT pkgs
-	for _, path := range importPaths([]string{os.Getenv("GOROOT"), runtime.GOROOT()}) {
+	for _, path := range importPaths(runtime.GOROOT()) {
 		fmt.Println(path)
 	}
 	fmt.Println("unsafe")
 
 	// output GOPATH pkgs
-	for _, path := range importPaths([]string{os.Getenv("GOPATH")}) {
+	for _, path := range importPaths(os.Getenv("GOPATH")) {
 		fmt.Println(path)
 	}
 }
 
-func importPaths(env []string) (imports []string) {
+func importPaths(env ...string) (imports []string) {
 	paths := map[string]bool{}
 	for _, ent := range env {
 		for _, path := range filepath.SplitList(ent) {
