@@ -31,23 +31,23 @@ import (
 
 func main() {
 	// output GOROOT pkgs
-	for _, path := range importPaths(runtime.GOROOT()) {
-		fmt.Println(path)
+	for _, p := range importPaths(runtime.GOROOT()) {
+		fmt.Println(p)
 	}
 	fmt.Println("unsafe")
 
 	// output GOPATH pkgs
-	for _, path := range importPaths(os.Getenv("GOPATH")) {
-		fmt.Println(path)
+	for _, p := range importPaths(os.Getenv("GOPATH")) {
+		fmt.Println(p)
 	}
 }
 
-func importPaths(env ...string) (imports []string) {
-	paths := map[string]bool{}
-	for _, ent := range env {
-		for _, path := range filepath.SplitList(ent) {
-			if path != "" {
-				paths[path] = true
+func importPaths(envs ...string) (paths []string) {
+	roots := map[string]bool{}
+	for _, env := range envs {
+		for _, root := range filepath.SplitList(env) {
+			if root != "" {
+				roots[root] = true
 			}
 		}
 	}
@@ -56,7 +56,7 @@ func importPaths(env ...string) (imports []string) {
 	pfx := strings.HasPrefix
 	sfx := strings.HasSuffix
 	osArchSfx := runtime.GOOS + "_" + runtime.GOARCH
-	for root, _ := range paths {
+	for root, _ := range roots {
 		root = filepath.Join(root, "pkg", osArchSfx)
 		walkF := func(p string, info os.FileInfo, err error) error {
 			if err == nil && !info.IsDir() {
@@ -67,7 +67,7 @@ func importPaths(env ...string) (imports []string) {
 						p = path.Clean(filepath.ToSlash(p))
 						if !seen[p] {
 							seen[p] = true
-							imports = append(imports, p)
+							paths = append(paths, p)
 						}
 					}
 				}
@@ -76,5 +76,5 @@ func importPaths(env ...string) (imports []string) {
 		}
 		filepath.Walk(root, walkF)
 	}
-	return imports
+	return paths
 }
