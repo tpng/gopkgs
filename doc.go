@@ -12,4 +12,4 @@ It is extracted from the margo import paths function
 bundled in GoSublime.
 
 */
-package main // import "github.com/tpng/gopkgs"
+package main
