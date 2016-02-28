@@ -29,6 +29,14 @@ import (
 	"strings"
 )
 
+func resolveSymlink(path string) string {
+  resolvePath,err := filepath.EvalSymlinks(path)
+  if err != nil {
+    return path
+  }
+  return resolvePath  
+}
+
 func main() {
 	// output GOROOT pkgs
 	for _, p := range importPaths(runtime.GOROOT()) {
@@ -57,7 +65,7 @@ func importPaths(envs ...string) (paths []string) {
 	sfx := strings.HasSuffix
 	osArchSfx := runtime.GOOS + "_" + runtime.GOARCH
 	for root, _ := range roots {
-		root = filepath.Join(root, "pkg", osArchSfx)
+		root = resolveSymlink(filepath.Join(root, "pkg", osArchSfx))
 		walkF := func(p string, info os.FileInfo, err error) error {
 			if err == nil && !info.IsDir() {
 				p, e := filepath.Rel(root, p)
