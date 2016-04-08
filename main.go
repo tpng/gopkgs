@@ -29,14 +29,6 @@ import (
 	"strings"
 )
 
-func resolveSymlink(path string) string {
-  resolvePath,err := filepath.EvalSymlinks(path)
-  if err != nil {
-    return path
-  }
-  return resolvePath  
-}
-
 func main() {
 	// output GOROOT pkgs
 	for _, p := range importPaths(runtime.GOROOT()) {
@@ -85,4 +77,12 @@ func importPaths(envs ...string) (paths []string) {
 		filepath.Walk(root, walkF)
 	}
 	return paths
+}
+
+func resolveSymlink(path string) string {
+	resolvePath, err := filepath.EvalSymlinks(path)
+	if err != nil {
+		return path
+	}
+	return resolvePath
 }
