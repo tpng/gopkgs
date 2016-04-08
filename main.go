@@ -59,19 +59,26 @@ func importPaths(envs ...string) (paths []string) {
 	for root, _ := range roots {
 		root = resolveSymlink(filepath.Join(root, "pkg", osArchSfx))
 		walkF := func(p string, info os.FileInfo, err error) error {
-			if err == nil && !info.IsDir() {
-				p, e := filepath.Rel(root, p)
-				if e == nil && sfx(p, ".a") {
-					p := p[:len(p)-2]
-					if !pfx(p, ".") && !pfx(p, "_") && !sfx(p, "_test") {
-						p = path.Clean(filepath.ToSlash(p))
-						if !seen[p] {
-							seen[p] = true
-							paths = append(paths, p)
-						}
-					}
-				}
+			if err != nil || info.IsDir() {
+				return nil
 			}
+
+			p, e := filepath.Rel(root, p)
+			if e != nil || !sfx(p, ".a") {
+				return nil
+			}
+
+			p = p[:len(p)-2]
+			if pfx(p, ".") || pfx(p, "_") || sfx(p, "_test") {
+				return nil
+			}
+
+			p = path.Clean(filepath.ToSlash(p))
+			if !seen[p] {
+				seen[p] = true
+				paths = append(paths, p)
+			}
+
 			return nil
 		}
 		filepath.Walk(root, walkF)
