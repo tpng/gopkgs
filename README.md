@@ -24,4 +24,4 @@ func New() *Example {
 }
 ```
 
-Both `gopkgs` and `go list all` will return `github.com/tpng/example.v1` as the import path where `gopkgs` has no way to return the real package name.
+Both `gopkgs` and `go list all` will return `github.com/tpng/example.v1` as the import path where `gopkgs` has no way to return the real package name `example`.
