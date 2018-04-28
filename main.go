@@ -75,6 +75,10 @@ func importPaths(envs ...string) (paths []string) {
 
 			p = path.Clean(filepath.ToSlash(p))
 			if !seen[p] {
+				if idx := strings.Index(p, "vendor/"); idx == 0 ||
+					(idx > 0 && p[idx-1] == '/') {
+					return nil
+				}
 				seen[p] = true
 				paths = append(paths, p)
 			}
