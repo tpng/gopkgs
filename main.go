@@ -29,6 +29,15 @@ import (
 	"strings"
 )
 
+var (
+	wd = ""
+)
+
+func init() {
+	if dir, err := os.Getwd(); err == nil {
+		wd = dir
+	}
+}
 func main() {
 	// output GOROOT pkgs
 	for _, p := range importPaths(runtime.GOROOT()) {
@@ -75,6 +84,15 @@ func importPaths(envs ...string) (paths []string) {
 
 			p = path.Clean(filepath.ToSlash(p))
 			if !seen[p] {
+				if strings.HasPrefix(p, "cmd") || strings.HasPrefix(p, "go/internal") || strings.HasPrefix(p, "internal") {
+					return nil
+				}
+				if idx := strings.Index(p, "internal"); idx > 1 {
+					prefix := p[0 : idx-1]
+					if !strings.HasSuffix(wd, prefix) {
+						return nil
+					}
+				}
 				if idx := strings.Index(p, "vendor/"); idx == 0 ||
 					(idx > 0 && p[idx-1] == '/') {
 					return nil
